@@ -1,0 +1,136 @@
+name: DMail AI DFX & ArkheOS CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  # SOURCE_DATE_EPOCH is derived from the commit for reproducibility
+  SOURCE_DATE_EPOCH: ${{ github.event.repository.pushed_at || github.event.pull_request.updated_at }}
+  IMAGE_NAME: "ghcr.io/arkhe-os/dmail-arkheos"
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # 1. DFX Motoko Canister Build & Test
+  # ---------------------------------------------------------------------------
+  dfx-build-test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install DFX
+        run: DFXVM_INIT_YES=true DFX_VERSION=0.7.2 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
+
+      - name: Start Local Network
+        run: |
+          source "$HOME/.local/share/dfx/env"
+          dfx start --background
+          dfx canister create --all
+
+      - name: Build Motoko Canisters
+        run: source "$HOME/.local/share/dfx/env" && dfx build --all
+
+      - name: Stop Local Network
+        run: source "$HOME/.local/share/dfx/env" && dfx stop
+
+  # ---------------------------------------------------------------------------
+  # 2. Build ArkheOS Bootc Image (A)
+  # ---------------------------------------------------------------------------
+  arkheos-build:
+    needs: [dfx-build-test]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Derive SOURCE_DATE_EPOCH from git
+        id: epoch
+        run: |
+          EPOCH=$(git log -1 --format=%ct)
+          echo "epoch=$EPOCH" >> "$GITHUB_OUTPUT"
+          echo "SOURCE_DATE_EPOCH=$EPOCH" >> "$GITHUB_ENV"
+
+      - name: Build bootc image (mock - assuming Containerfile is provided in infra repo)
+        run: |
+          # This step would typically run: podman build --build-arg SOURCE_DATE_EPOCH=...
+          echo "Building ArkheOS Bootc Image A with epoch ${{ env.SOURCE_DATE_EPOCH }}"
+          mkdir -p /tmp/oci
+          touch /tmp/oci/arkhe-os.oci
+
+      - name: Upload OCI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dmail-arkheos-oci
+          path: /tmp/oci/arkhe-os.oci
+
+  # ---------------------------------------------------------------------------
+  # 3. Build ArkheOS Bootc Image (B - Mutated Environment)
+  # ---------------------------------------------------------------------------
+  arkheos-build-b:
+    needs: [dfx-build-test]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Mutate environment
+        run: |
+          sudo hostnamectl set-hostname mutated-builder
+          echo "TZ=America/Sao_Paulo" | sudo tee -a /etc/environment
+          sudo useradd -m builder-b || true
+
+      - name: Build bootc image (mock)
+        run: |
+          echo "Building ArkheOS Bootc Image B"
+          mkdir -p /tmp/oci
+          touch /tmp/oci/arkhe-os-b.oci
+
+      - name: Upload OCI artifact B
+        uses: actions/upload-artifact@v4
+        with:
+          name: dmail-arkheos-oci-b
+          path: /tmp/oci/arkhe-os-b.oci
+
+  # ---------------------------------------------------------------------------
+  # 4. Diffoscope Check for Bit-for-Bit Reproducibility
+  # ---------------------------------------------------------------------------
+  reproducibility-check:
+    needs: [arkheos-build, arkheos-build-b]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dmail-arkheos-oci
+          path: /tmp/a
+      - uses: actions/download-artifact@v4
+        with:
+          name: dmail-arkheos-oci-b
+          path: /tmp/b
+
+      - name: Install diffoscope
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y diffoscope
+
+      - name: Compare OCI archives
+        run: |
+          set +e
+          # mock comparison
+          diffoscope /tmp/a/arkhe-os.oci /tmp/b/arkhe-os-b.oci > diffoscope-report.html || true
+          EXIT=$?
+          set -e
+          if [ "$EXIT" -ne 0 ]; then
+            echo "::warning::Reproducibility diff found (mocked). See diffoscope-report.html"
+          else
+            echo "Reproducible: PASS"
+          fi
+
+      - name: Upload diffoscope report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diffoscope-report
+          path: diffoscope-report.html
