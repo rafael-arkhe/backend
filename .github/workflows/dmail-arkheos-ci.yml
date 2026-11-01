@@ -21,12 +21,12 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install DFX
-        run: DFXVM_INIT_YES=true DFX_VERSION=0.7.2 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
+        run: DFXVM_INIT_YES=true DFX_VERSION=0.8.4 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
 
       - name: Start Local Network
         run: |
           source "$HOME/.local/share/dfx/env"
-          dfx start --background
+          dfx start --clean --background
           dfx canister create --all
 
       - name: Build Motoko Canisters
