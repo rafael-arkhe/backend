@@ -8,7 +8,7 @@ on:
 
 env:
   # SOURCE_DATE_EPOCH is derived from the commit for reproducibility
-  SOURCE_DATE_EPOCH: \${{ github.event.repository.pushed_at || github.event.pull_request.updated_at }}
+  SOURCE_DATE_EPOCH: ${{ github.event.repository.pushed_at || github.event.pull_request.updated_at }}
   IMAGE_NAME: "ghcr.io/arkhe-os/dmail-arkheos"
 
 jobs:
@@ -50,14 +50,14 @@ jobs:
       - name: Derive SOURCE_DATE_EPOCH from git
         id: epoch
         run: |
-          EPOCH=\$(git log -1 --format=%ct)
-          echo "epoch=\$EPOCH" >> "\$GITHUB_OUTPUT"
-          echo "SOURCE_DATE_EPOCH=\$EPOCH" >> "\$GITHUB_ENV"
+          EPOCH=$(git log -1 --format=%ct)
+          echo "epoch=$EPOCH" >> "$GITHUB_OUTPUT"
+          echo "SOURCE_DATE_EPOCH=$EPOCH" >> "$GITHUB_ENV"
 
       - name: Build bootc image (mock - assuming Containerfile is provided in infra repo)
         run: |
           # This step would typically run: podman build --build-arg SOURCE_DATE_EPOCH=...
-          echo "Building ArkheOS Bootc Image A with epoch \${{ env.SOURCE_DATE_EPOCH }}"
+          echo "Building ArkheOS Bootc Image A with epoch ${{ env.SOURCE_DATE_EPOCH }}"
           mkdir -p /tmp/oci
           touch /tmp/oci/arkhe-os.oci
 
@@ -120,9 +120,9 @@ jobs:
           set +e
           # mock comparison
           diffoscope /tmp/a/arkhe-os.oci /tmp/b/arkhe-os-b.oci > diffoscope-report.html || true
-          EXIT=\$?
+          EXIT=$?
           set -e
-          if [ "\$EXIT" -ne 0 ]; then
+          if [ "$EXIT" -ne 0 ]; then
             echo "::warning::Reproducibility diff found (mocked). See diffoscope-report.html"
           else
             echo "Reproducible: PASS"
