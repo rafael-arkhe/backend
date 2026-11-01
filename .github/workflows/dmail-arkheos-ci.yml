@@ -21,16 +21,19 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install DFX
-        run: DFX_VERSION=0.7.2 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
+        run: DFXVM_INIT_YES=true DFX_VERSION=0.7.2 sh -ci "$(curl -fsSL https://sdk.dfinity.org/install.sh)"
 
       - name: Start Local Network
-        run: dfx start --background
+        run: |
+          source "$HOME/.local/share/dfx/env"
+          dfx start --background
+          dfx canister create --all
 
       - name: Build Motoko Canisters
-        run: dfx build --all
+        run: source "$HOME/.local/share/dfx/env" && dfx build --all
 
       - name: Stop Local Network
-        run: dfx stop
+        run: source "$HOME/.local/share/dfx/env" && dfx stop
 
   # ---------------------------------------------------------------------------
   # 2. Build ArkheOS Bootc Image (A)
