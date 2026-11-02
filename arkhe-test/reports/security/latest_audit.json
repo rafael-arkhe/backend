@@ -1,0 +1,92 @@
+{
+  "suite_name": "Arkhe-Test Continuous Invariant Pipeline",
+  "stage": "all",
+  "timestamp": 1793592113,
+  "commit_ref": "HEAD",
+  "total_invariants_tested": 10,
+  "total_passed": 10,
+  "all_invariants_satisfied": true,
+  "report_content_digest": "bafkreport67ed6f8f11493b07c8a1323fd670cea621405ec94521efdcca14fabd165f1ea8",
+  "results": [
+    {
+      "invariant_code": "I-01",
+      "description": "Chunk íntegro (alteração de 1 byte resulta em rejeição imediata)",
+      "passed": true,
+      "nominal_test_passed": true,
+      "adversarial_rejection_passed": true,
+      "error_message": null
+    },
+    {
+      "invariant_code": "I-02",
+      "description": "Manifesto verificável (troca de CID ou chunk faltante invalida manifesto)",
+      "passed": true,
+      "nominal_test_passed": true,
+      "adversarial_rejection_passed": true,
+      "error_message": null
+    },
+    {
+      "invariant_code": "I-03",
+      "description": "Recibo AFiR (assinatura ML-DSA-65 válida e proteção contra replay de nonce)",
+      "passed": true,
+      "nominal_test_passed": true,
+      "adversarial_rejection_passed": true,
+      "error_message": null
+    },
+    {
+      "invariant_code": "I-04",
+      "description": "MMR append-only (reordenamento ou remoção de folhas invalida a raiz)",
+      "passed": true,
+      "nominal_test_passed": true,
+      "adversarial_rejection_passed": true,
+      "error_message": null
+    },
+    {
+      "invariant_code": "I-05",
+      "description": "Auditoria offline (bundle offline detecta reescrita sem conexão de rede)",
+      "passed": true,
+      "nominal_test_passed": true,
+      "adversarial_rejection_passed": true,
+      "error_message": null
+    },
+    {
+      "invariant_code": "I-06",
+      "description": "Vínculo ao dispositivo (chave e atestação Titan/StrongBox obrigatórias)",
+      "passed": true,
+      "nominal_test_passed": true,
+      "adversarial_rejection_passed": true,
+      "error_message": null
+    },
+    {
+      "invariant_code": "I-07",
+      "description": "Governança humana (proposta autônoma não altera constituição sem aprovação)",
+      "passed": true,
+      "nominal_test_passed": true,
+      "adversarial_rejection_passed": true,
+      "error_message": null
+    },
+    {
+      "invariant_code": "I-08",
+      "description": "Reward por prova (pagamento bloqueado sem recibo e MMR válidos)",
+      "passed": true,
+      "nominal_test_passed": true,
+      "adversarial_rejection_passed": true,
+      "error_message": null
+    },
+    {
+      "invariant_code": "I-09",
+      "description": "Evidência chain-agnostic (verificação de bundle independente de blockchain)",
+      "passed": true,
+      "nominal_test_passed": true,
+      "adversarial_rejection_passed": true,
+      "error_message": null
+    },
+    {
+      "invariant_code": "I-10",
+      "description": "Papéis disjuntos (worker não pode validar no mesmo epoch)",
+      "passed": true,
+      "nominal_test_passed": true,
+      "adversarial_rejection_passed": true,
+      "error_message": null
+    }
+  ]
+}

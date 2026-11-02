@@ -1,0 +1,9 @@
+{
+  "model_id": "arkhe-llm-70b-v1",
+  "chunk_cids": [
+    "bafk92019830422b301266d3adb10ace9b86b4e6e1a674ddadc4c9793ebfc6e661f6",
+    "bafk753b4c39b65cfde56aaf4faabf1cc1ff6f4cb6595417736a5cf1be51fe6224cd",
+    "bafk8c871bf91fef903067cc62a34e79bbaf86db8be879d333f9a848fdbe1740e542"
+  ],
+  "expected_root_cid": "bafkroot5d7cd97a9c9765744ba23e4720ff788e5d127a5bb721a92289c523886e964fef"
+}
