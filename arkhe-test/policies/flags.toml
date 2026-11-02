@@ -1,0 +1,22 @@
+# Arkhe Feature Flags Policy Configuration
+# Rule I-T06: Feature flags can activate features, NEVER disable mandatory security verifications!
+# flag NOT IN {signature check, hash check, MMR append-only, role separation}
+
+[flags]
+"network.experimental_transport" = { enabled = true, target = "transport_layer", allows_disabling_security = false }
+"moe.receipt_tree" = { enabled = true, target = "receipt_tree_generation", allows_disabling_security = false }
+"audit.bundle_v2" = { enabled = true, target = "bundle_format_extension", allows_disabling_security = false }
+"cal.anchor_batching" = { enabled = true, target = "batch_frequency", allows_disabling_security = false }
+"inference.zk_sampling" = { enabled = false, target = "sampling_rate", allows_disabling_security = false }
+"mcp.action_tools" = { enabled = false, target = "write_tool_exposure", allows_disabling_security = false }
+"governance.proposals" = { enabled = true, target = "proposal_submission", allows_disabling_security = false }
+
+[inviolable_security_checks]
+mandatory = [
+    "signature check",
+    "hash check",
+    "MMR append-only",
+    "role separation",
+    "device binding",
+    "offline bundle verification"
+]

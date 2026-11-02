@@ -13,6 +13,40 @@ env:
 
 jobs:
   # ---------------------------------------------------------------------------
+  # 0. Arkhe-Test: Invariant & Continuous Verification Pipeline
+  # ---------------------------------------------------------------------------
+  arkhe-test-pipeline:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Verify Feature Flags Policy (I-T06)
+        run: |
+          cd arkhe-test
+          cargo run -- verify-flags
+
+      - name: Run Stage 1 (Unit & Golden Vectors) and Invariant Matrix (I-01..I-10)
+        run: |
+          cd arkhe-test
+          cargo test
+          cargo run -- run --stage all
+
+      - name: Verify Rollback Safety (I-T05)
+        run: |
+          cd arkhe-test
+          cargo run -- verify-rollback
+
+      - name: Upload Test and Security Audit Reports (I-T07)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: arkhe-test-audit-report
+          path: arkhe-test/reports/security/latest_audit.json
+
+  # ---------------------------------------------------------------------------
   # 1. DFX Motoko Canister Build & Test
   # ---------------------------------------------------------------------------
   dfx-build-test:

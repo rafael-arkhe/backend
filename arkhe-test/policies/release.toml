@@ -1,0 +1,21 @@
+# Arkhe Release Policy Configuration
+# Strategy: Hermetic build, signed provenance, canary (1-5%), staged rollout (10->25->50->100%), auto-halt
+
+[release]
+version = "0.1.0"
+hermetic_build = true
+signed_provenance = true
+
+[rollout_stages]
+canary_percent = 5
+stage_1_percent = 10
+stage_2_percent = 25
+stage_3_percent = 50
+stage_final_percent = 100
+
+[auto_halt_thresholds]
+max_error_rate_percent = 0.5
+max_divergence_mmr = 0
+max_invalid_receipts_accepted = 0
+max_corrupt_chunks_accepted = 0
+min_canary_success_rate_percent = 99.5

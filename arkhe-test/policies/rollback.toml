@@ -1,0 +1,12 @@
+# Arkhe Rollback Policy Configuration
+# Rule I-T05: Rollback is permitted for code and configuration ONLY.
+# Rollback NEVER rewrites MMR, receipts, or checkpoints.
+# Existing valid evidence MUST remain intact and readable.
+
+[rollback]
+max_rollback_time_minutes = 10
+preserve_mmr_history = true
+preserve_receipts = true
+preserve_checkpoints = true
+allow_destructive_migrations = false
+state_storage_mode = "append_only"
